@@ -17,8 +17,8 @@ namespace Education.Babikov.Plugins
             IPluginExecutionContext context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
             IOrganizationService service = factory.CreateOrganizationService(context.UserId);
 
-            if (String.Equals("Update", context.MessageName, StringComparison.OrdinalIgnoreCase) && 
-                context.Stage == 40 && 
+            if (String.Equals("Update", context.MessageName, StringComparison.OrdinalIgnoreCase) &&
+                context.Stage == 40 &&
                 context.PrimaryEntityName == "new_store_babikov")
             {
                 Entity target = context.InputParameters["Target"] as Entity;
@@ -61,8 +61,12 @@ namespace Education.Babikov.Plugins
 
                 // Fill result string with records
                 foreach (var item in products)
-                {                    
-                    newEnt["new_showcaseproducts"] += String.Format("{0} - {1}; ", item.GetAttributeValue<string>("new_name"), item.GetAttributeValue<Money>("new_price").Value.ToString());
+                {
+                    // Should check if price not null
+                    // use if trenar
+                    var price = item.GetAttributeValue<Money>("new_price");
+                    newEnt["new_showcaseproducts"] += String.Format("{0} - {1}; ", item.GetAttributeValue<string>("new_name"),
+                      price != null ? price.Value : "No price" );
                 }
                 service.Update(newEnt);
             }
