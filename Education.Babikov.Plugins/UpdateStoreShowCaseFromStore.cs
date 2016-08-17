@@ -66,7 +66,7 @@ namespace Education.Babikov.Plugins
                     // use if trenar
                     var price = item.GetAttributeValue<Money>("new_price");
                     newEnt["new_showcaseproducts"] += String.Format("{0} - {1}; ", item.GetAttributeValue<string>("new_name"),
-                      price != null ? price.Value : "No price" );
+                      price != null ? price.Value.ToString() : "No price" );
                 }
                 service.Update(newEnt);
             }
