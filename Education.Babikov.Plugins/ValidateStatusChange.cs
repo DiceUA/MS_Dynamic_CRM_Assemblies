@@ -24,6 +24,8 @@ namespace Education.Babikov.Plugins
             // Debug.Log
             ITracingService trace = serviceProvider.GetService(typeof(ITracingService)) as ITracingService;
 
+            trace.Trace("Validate status initialized!");
+
             // Check whether we have image
             if (String.Equals("Update", context.MessageName, StringComparison.OrdinalIgnoreCase) &&
                 context.Stage == 40 &&
@@ -50,13 +52,40 @@ namespace Education.Babikov.Plugins
                 else
                     oldOptionValue = oldOption.Value;
 
+                trace.Trace("New Option Value: " + newOptionValue +"\nOld Option Value: " + oldOptionValue);
                 // New - 100 000 000
                 // Confirmed - 100 000 001 etc
                 // User can only change option to next or previous.
                 if (newOptionValue > oldOptionValue + 1 || newOptionValue < oldOptionValue - 1)
                 {
+                    trace.Trace("WTF?!");
                     throw new InvalidPluginExecutionException("Invalid status change!");
                 }
+
+                trace.Trace("Status changed");
+                // If everything is ok
+                // link action execution
+                OrganizationRequest request = new OrganizationRequest("new_Action_OrderStatusChange_babikov")
+                {
+                    Parameters =
+                    {
+                        { "Target", new EntityReference("new_order_babikov", target.Id) }, // Our action have Entity so we need to declare Target
+                        { "Subject", "Field changed" },
+                        { "Body", oldOptionValue }
+                    }
+                };
+                trace.Trace("Request ready");
+                OrganizationResponse response = service.Execute(request);
+                trace.Trace("Response ready");
+
+                // No need
+                if (response.Results.ContainsKey("Contact"))
+                {
+                    // Gets output parameter from action
+                    EntityReference contactRef = response.Results["Contact"] as EntityReference;
+                    trace.Trace("Contact ref: " + contactRef.Id);
+                }
+
             }
         }
     }
