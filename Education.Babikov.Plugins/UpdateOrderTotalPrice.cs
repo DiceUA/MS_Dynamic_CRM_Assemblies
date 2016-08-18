@@ -36,7 +36,7 @@ namespace Education.Babikov.Plugins
                 if(relationship.SchemaName == "new_order_babikov_storeproduct_babikov")
                 {
                     if (target.LogicalName == "new_order_babikov")
-                    {                       
+                    {
                         UpdateContent(target.Id, service, trace);
                     }
                 }
@@ -72,14 +72,14 @@ namespace Education.Babikov.Plugins
                             }
                         }
                     }
-                }                
-            };            
-            IReadOnlyCollection<Entity> products = service.RetrieveMultiple(query).Entities;            
+                }
+            };
+            IReadOnlyCollection<Entity> products = service.RetrieveMultiple(query).Entities;
 
             // If we get something
             if(products != null)
             {
-                // Debug Log 
+                // Debug Log
                 foreach (var item in products)
                 {
                     trace.Trace("Product name: " + item.GetAttributeValue<string>("new_name"));
@@ -98,22 +98,27 @@ namespace Education.Babikov.Plugins
                 if (products.Count < 2)
                     discount = 0;
                 else if (products.Count > 11)
-                    discount = 50;                               
+                    discount = 50;
                 else
                     discount = 5 * (products.Count - 1);
 
                 // Get total price
                 foreach (var item in products)
                 {
-                    price += item.GetAttributeValue<Money>("new_price").Value;
+                    // Always make this checks with Money, OptionSet and EntityReference
+                    var priceObj = item.GetAttributeValue<Money>("new_price");
+                    if(priceObj != null)
+                    {
+                        price += priceObj.Value;
+                    }
                     trace.Trace("Price: " + price.ToString());
                 }
-                // Set attributes              
+                // Set attributes
                 newOrder["new_discount"] = discount;
-                newOrder["new_totalprice"] = new Money() { Value = price }; 
+                newOrder["new_totalprice"] = new Money() { Value = price };
                 // Update current order
                 service.Update(newOrder);
-            }                                  
-        }        
+            }
+        }
     }
 }

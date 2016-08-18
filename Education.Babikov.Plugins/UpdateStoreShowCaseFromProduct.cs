@@ -25,7 +25,10 @@ namespace Education.Babikov.Plugins
                 OptionSetValue chosenOption = target.GetAttributeValue<OptionSetValue>("new_producttype");
                 string currentName = target.GetAttributeValue<string>("new_name");
                 EntityReference currentShop = target.GetAttributeValue<EntityReference>("new_storeid");
-                string currentPrice = target.GetAttributeValue<Money>("new_price").Value.ToString();
+                Money currentPriceObj = target.GetAttributeValue<Money>("new_price");
+                string currentPrice = 0;
+                if(currentPriceObj != null)
+                    currentPrice = currentPriceObj.Value.ToString();
 
                 // Make exception if current shop or option not selected - end plugin execution
                 if (currentShop == null || chosenOption == null)
@@ -42,11 +45,11 @@ namespace Education.Babikov.Plugins
                         {
                             new ConditionExpression("new_showcaseproductstype", ConditionOperator.Equal, chosenOption.Value),
                             // Select only store that selected in Store field
-                            new ConditionExpression("new_store_babikovid",ConditionOperator.Equal,target.GetAttributeValue<EntityReference>("new_storeid").Id)                            
+                            new ConditionExpression("new_store_babikovid",ConditionOperator.Equal,target.GetAttributeValue<EntityReference>("new_storeid").Id)
                         }
                     }
                 };
-                IReadOnlyCollection<Entity> stores = service.RetrieveMultiple(query).Entities;                
+                IReadOnlyCollection<Entity> stores = service.RetrieveMultiple(query).Entities;
                 if (stores != null)
                 {
 
@@ -65,16 +68,16 @@ namespace Education.Babikov.Plugins
                         };
                         if (currentPrice != null && currentName != null && currentShop != null)
                         {
-                            // resultString will be filled if ColumnSet in Query filled with correct field eg. new_showcaseproducts 
-                            string resultString = item.GetAttributeValue<string>("new_showcaseproducts");                            
-                            newEnt["new_showcaseproducts"] = resultString + currentName + " - " + currentPrice+"; ";  
+                            // resultString will be filled if ColumnSet in Query filled with correct field eg. new_showcaseproducts
+                            string resultString = item.GetAttributeValue<string>("new_showcaseproducts");
+                            newEnt["new_showcaseproducts"] = resultString + currentName + " - " + currentPrice+"; ";
                             // += not working here coz this parameter null when new entity created DO NOT FORGET!
-                            //String.Format("{0} - {1}; ", target.GetAttributeValue<string>("new_name"), target.GetAttributeValue<Money>("new_price").Value.ToString());                            
-                        }                            
+                            //String.Format("{0} - {1}; ", target.GetAttributeValue<string>("new_name"), target.GetAttributeValue<Money>("new_price").Value.ToString());
+                        }
                         // Update record
                         service.Update(newEnt);
                     }
-                    
+
                     service.Update(newProduct);
                 }
             }

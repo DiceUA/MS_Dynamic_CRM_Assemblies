@@ -12,8 +12,8 @@ namespace Education.Babikov.Plugins
 {
     public class ValidateStatusChange : IPlugin
     {
-        
-        
+
+
 
         public void Execute(IServiceProvider serviceProvider)
         {
@@ -35,7 +35,13 @@ namespace Education.Babikov.Plugins
                 // Get old entity values
                 Entity preImage = context.PreEntityImages["Image"];
                 // Get option new and old values
-                int newOptionValue = target.GetAttributeValue<OptionSetValue>("new_statuscode").Value;                
+                OptionSetValue newOption = target.GetAttributeValue<OptionSetValue>("new_statuscode");
+                int newOptionValue = 0;
+                if(newOption != null)
+                    newOptionValue = newOption.Value;
+                else
+                    throw new InvalidPluginExecutionException("Status Can't be null or empty");
+
                 OptionSetValue oldOption = preImage.GetAttributeValue<OptionSetValue>("new_statuscode");
                 int oldOptionValue = 0;
                 // If option value unassigned set value to first
