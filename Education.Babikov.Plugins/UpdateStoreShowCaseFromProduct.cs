@@ -26,9 +26,9 @@ namespace Education.Babikov.Plugins
                 string currentName = target.GetAttributeValue<string>("new_name");
                 EntityReference currentShop = target.GetAttributeValue<EntityReference>("new_storeid");
                 Money currentPriceObj = target.GetAttributeValue<Money>("new_price");
-                string currentPrice = 0;
+                decimal currentPrice = 0m;
                 if(currentPriceObj != null)
-                    currentPrice = currentPriceObj.Value.ToString();
+                    currentPrice = currentPriceObj.Value;
 
                 // Make exception if current shop or option not selected - end plugin execution
                 if (currentShop == null || chosenOption == null)
@@ -49,15 +49,15 @@ namespace Education.Babikov.Plugins
                         }
                     }
                 };
-                IReadOnlyCollection<Entity> stores = service.RetrieveMultiple(query).Entities;
-                if (stores != null)
+                IReadOnlyCollection<Entity> stores = service.RetrieveMultiple(query).Entities; // This collection can't be null
+                if (stores.Count > 0)
                 {
 
                     Entity newProduct = new Entity("new_storeproduct_babikov")
                     {
                         Id = target.Id
                     };
-                    newProduct["new_debuglog"] = currentName + "\n" + currentPrice + "\n" + currentShop.Id+ "\n";
+                    //newProduct["new_debuglog"] = currentName + "\n" + currentPrice + "\n" + currentShop.Id+ "\n";
                     //String.Format("Name: {0}\nShop: {1}\nPrice: {3}\n", currentName, currentShop, currentPrice); // Y not working?
 
                     foreach (var item in stores)
@@ -66,7 +66,7 @@ namespace Education.Babikov.Plugins
                         {
                             Id = item.Id
                         };
-                        if (currentPrice != null && currentName != null && currentShop != null)
+                        if (currentShop != null)
                         {
                             // resultString will be filled if ColumnSet in Query filled with correct field eg. new_showcaseproducts
                             string resultString = item.GetAttributeValue<string>("new_showcaseproducts");

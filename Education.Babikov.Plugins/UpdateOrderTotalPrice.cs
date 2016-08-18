@@ -77,7 +77,7 @@ namespace Education.Babikov.Plugins
             IReadOnlyCollection<Entity> products = service.RetrieveMultiple(query).Entities;
 
             // If we get something
-            if(products != null)
+            if(products.Count > 0)
             {
                 // Debug Log
                 foreach (var item in products)
@@ -106,7 +106,7 @@ namespace Education.Babikov.Plugins
                 foreach (var item in products)
                 {
                     // Always make this checks with Money, OptionSet and EntityReference
-                    var priceObj = item.GetAttributeValue<Money>("new_price");
+                    Money priceObj = item.GetAttributeValue<Money>("new_price");
                     if(priceObj != null)
                     {
                         price += priceObj.Value;
@@ -115,7 +115,7 @@ namespace Education.Babikov.Plugins
                 }
                 // Set attributes
                 newOrder["new_discount"] = discount;
-                newOrder["new_totalprice"] = new Money() { Value = price };
+                newOrder["new_totalprice"] = new Money() { Value = price - price * discount / 100 };//{ Value = price }; // 
                 // Update current order
                 service.Update(newOrder);
             }
