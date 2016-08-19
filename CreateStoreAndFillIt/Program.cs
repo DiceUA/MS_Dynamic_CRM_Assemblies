@@ -18,8 +18,8 @@ namespace CreateStoreAndFillIt
             var connection = new CrmConnection("Crm");
             IOrganizationService service = new OrganizationService(connection);
 
-            int storeCount = 1;
-            int productCount = 2;
+            int storeCount = 10;
+            int productCount = 20;
             #endregion
             // How to check if connection established or there is internet problems? Or incorrect user or password
 
